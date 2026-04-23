@@ -1,0 +1,37 @@
+## ------------------------------------------------------------------------------------------------------------------------------
+# Find variables that are aliased (linear combinations of each other)
+al <- alias(model)
+rownames(al$Complete)
+
+## ----include=FALSE-------------------------------------------------------------------------------------------------------------
+al$Complete["Bldg.TypeDuplex", , drop = FALSE] #MS.SubClass90
+al$Complete["Exterior.2ndCBlock", , drop = FALSE] #Exterior.1stCBlock
+al$Complete["Exterior.2ndPreCast", , drop = FALSE] #Exterior.1stPreCast
+al$Complete["Total.Bsmt.SF", , drop = FALSE] #BsmtFin.SF.1, BsmtFin.SF.2 Bsmt.Unf.SF
+al$Complete["Gr.Liv.Area", , drop = FALSE] #X1st.Flr.SF X2nd.Flr.SF Low.Qual.Fin.SF
+al$Complete["Garage.FinishNP", , drop = FALSE] #Garage.TypeNP
+al$Complete["Garage.QualTA", , drop = FALSE] #Garage.FinishFin, Garage.FinishRFn, Garage.FinishUnf, Garage.QualEx, Garage.QualFa, Garage.QualGd
+al$Complete["Garage.CondTA", , drop = FALSE] #Garage.FinishFin, Garage.FinishRFn, Garage.FinishUnf, Garage.CondEx, Garage.CondFa, Garage.CondGd Garage.CondPo
+
+
+## ------------------------------------------------------------------------------------------------------------------------------
+# Remove MS.SubClass90, Exterior.2ndCBlock, Exterior.2ndPreCast
+ames = subset(ames, select = -c(MS.SubClass, Exterior.2nd, BsmtFin.SF.1, BsmtFin.SF.2, Bsmt.Unf.SF, X1st.Flr.SF, X2nd.Flr.SF, Low.Qual.Fin.SF, Garage.Cond, Garage.Qual, Garage.Finish))
+
+
+## ------------------------------------------------------------------------------------------------------------------------------
+library(car)
+
+model = lm(SalePrice~., data=ames)
+car::vif(model)
+
+
+## ------------------------------------------------------------------------------------------------------------------------------
+# Remove Garage.Yr.Blt
+ames = subset(ames, select = -c(Garage.Yr.Blt))
+
+
+## ------------------------------------------------------------------------------------------------------------------------------
+model = lm(SalePrice~., data=ames)
+car::vif(model)
+
