@@ -1,13 +1,12 @@
 # ------------------------------------
 # Data Cleaning
 # ------------------------------------
-library(mice)
-
-data = read.csv("data/AmesHousing.csv", header=TRUE)
+data = read.csv("/Users/gracewang/stat318-housing-prediction/data/AmesHousing.csv", header=TRUE)
 summary(data)
 
 
 # Inventory of NA's
+colSums(is.na(data))
 na.counts <- colSums(is.na(data))
 txt <- capture.output(print(na.counts))
 
@@ -92,3 +91,5 @@ data = data[,-c(1,2)]
 colSums(is.na(data))
 
 write.csv(data, "data/ames_no_na.csv", row.names = FALSE)
+
+dim(data)
