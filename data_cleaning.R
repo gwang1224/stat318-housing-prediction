@@ -81,6 +81,13 @@ data$Bsmt.Qual[is.na(data$Bsmt.Qual)] = 0
 data$Bsmt.Cond[is.na(data$Bsmt.Cond)] = 0
 data$Bsmt.Exposure[is.na(data$Bsmt.Exposure)] = 0
 data$BsmtFin.Type.1[is.na(data$BsmtFin.Type.1)] = 0
+data$BsmtFin.Type.2[is.na(data$BsmtFin.Type.2)] = 0
+
+# Indicator variable when there is no Masonry veneer 
+data$Mas.Vnr.Area[is.na(data$Mas.Vnr.Area)] = 0
+
+# Removing columns for Order, PID - identifiers not used for prediction
+data = data[,-c(1,2)]
 
 colSums(is.na(data))
 
