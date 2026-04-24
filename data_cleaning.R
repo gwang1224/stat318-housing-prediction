@@ -71,16 +71,16 @@ colnames(rows)[colSums(is.na(rows)) > 0]
 data = data[!is.na(data$Garage.Cars),]
 
 # Indicator variable for when Garage is not present
-data$Garage.Yr.Blt[is.na(data$Garage.Yr.Blt)] = 0
-data$Garage.Qual[is.na(data$Garage.Qual)] = 0
-data$Garage.Cond[is.na(data$Garage.Cond)] = 0
+data$Garage.Yr.Blt[is.na(data$Garage.Yr.Blt)] = "NP"
+data$Garage.Qual[is.na(data$Garage.Qual)] = "NP"
+data$Garage.Cond[is.na(data$Garage.Cond)] = "NP"
 
 # Indicator variable for when Basement is not Present
-data$Bsmt.Qual[is.na(data$Bsmt.Qual)] = 0
-data$Bsmt.Cond[is.na(data$Bsmt.Cond)] = 0
-data$Bsmt.Exposure[is.na(data$Bsmt.Exposure)] = 0
-data$BsmtFin.Type.1[is.na(data$BsmtFin.Type.1)] = 0
-data$BsmtFin.Type.2[is.na(data$BsmtFin.Type.2)] = 0
+data$Bsmt.Qual[is.na(data$Bsmt.Qual)] = "NP"
+data$Bsmt.Cond[is.na(data$Bsmt.Cond)] = "NP"
+data$Bsmt.Exposure[is.na(data$Bsmt.Exposure)] = "NP"
+data$BsmtFin.Type.1[is.na(data$BsmtFin.Type.1)] = "NP"
+data$BsmtFin.Type.2[is.na(data$BsmtFin.Type.2)] = "NP"
 
 # Indicator variable when there is no Masonry veneer 
 data$Mas.Vnr.Area[is.na(data$Mas.Vnr.Area)] = 0
@@ -90,6 +90,7 @@ data = data[,-c(1,2)]
 
 colSums(is.na(data))
 
-write.csv(data, "data/ames_no_na.csv", row.names = FALSE)
+write.csv(data, "/Users/gracewang/stat318-housing-prediction/data/ames_no_na.csv", row.names = FALSE)
 
 dim(data)
+
