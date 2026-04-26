@@ -75,20 +75,73 @@ text(ames.tree.new,pretty=0,cex = 0.4)
 
 
 # Using Random Forest Ensemble Method
-model.randomForest <- randomForest(SalePrice~.,data=data,ntree=500,mtry=(ncol(data)-1)/3)
+#model.randomForest <- randomForest(SalePrice~.,data=data,ntree=500,mtry=(ncol(data)-1)/3)
 
 
-# LEAVE-ONE-OUT CROSS VALIDATION - comparing AIC, BIC, Regression Tree, and Random Forest models
+# LEAVE-ONE-OUT CROSS VALIDATION - comparing AIC, BIC, Regression Tree models
+# getting rid of all the samples with single observation per categorical level
+categorical <- names(data)[sapply(data, is.character)]
+df_no_singletons <- data
 
-CV_AIC <- press(lm(formula(model.aic), data=data))*(1/n) 
+repeat {
+  before_n <- nrow(df_no_singletons)
+  
+  for (column_name in categorical) {
+    counts <- table(df_no_singletons[[column_name]])
+    keep_levels <- names(counts[counts > 1])
+    
+    df_no_singletons <- df_no_singletons[
+      df_no_singletons[[column_name]] %in% keep_levels,
+      ,
+      drop = FALSE
+    ]
+  }
+  
+  if (nrow(df_no_singletons) == before_n) break
+}
 
-CV_BIC <- press(lm(formula(model.bic), data=data))*(1/n) 
 
-CV_tree <- press(tree(SalePrice~., data=data))*(1/n)
-  # k-fold cross validation caused issues, as the training set doesn't contain all the levels
-  # of the predictors
+  # LOOCV for AIC 
+attach(df_no_singletons)
+N <- nrow(df_no_singletons)
+diff <- rep(NA,N)
 
-#CV_randomForest <- press(randomForest(SalePrice~.,data=data,ntree=500,mtry=(ncol(data)-1)/3))*(1/n)
+for (i in 1:N) {
+  fit <- lm(formula(model.aic), data=df_no_singletons[-i,])
+  Y.hat <- predict(fit, newdata = df_no_singletons[i,] )
+  diff[i] <- SalePrice[i]-Y.hat
+}
+
+AIC_CV = mean(diff^2) #605886404
+AIC_CV
+
+  # LOOCV for BIC 
+attach(df_no_singletons)
+N <- nrow(df_no_singletons)
+diff <- rep(NA,N)
+
+for (i in 1:N) {
+  fit <- lm(formula(model.bic), data=df_no_singletons[-i,])
+  Y.hat <- predict(fit, newdata = df_no_singletons[i,] )
+  diff[i] <- SalePrice[i]-Y.hat
+}
+
+BIC_CV = mean(diff^2) #620420014
+BIC_CV
+
+# LOOCV for regression tree
+attach(df_no_singletons)
+N <- nrow(df_no_singletons)
+diff <- rep(NA,N)
+
+for (i in 1:N) {
+  fit <- tree(SalePrice~., data=df_no_singletons[-i,])
+  Y.hat <- predict(fit, newdata = df_no_singletons[i,] )
+  diff[i] <- SalePrice[i]-Y.hat
+}
+
+tree_CV = mean(diff^2) #1541472114
+tree_CV
 
 #AIC model has lowest leave-one-out CV score out of AIC and BIC
 
