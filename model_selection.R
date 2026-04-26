@@ -20,38 +20,46 @@ formula(model.bic) #formula for BIC model
 
 
 # ---------------------------- MLR ------------------------------
-
-#SalePrice ~ Lot.Area + Street + Land.Slope + Neighborhood + Condition.2 + 
-#  Bldg.Type + Overall.Qual + Overall.Cond + Year.Built + Year.Remod.Add + 
-#  Roof.Matl + Mas.Vnr.Area + Exter.Qual + Bsmt.Qual + Total.Bsmt.SF + 
-#  Gr.Liv.Area + Bsmt.Full.Bath + Bedroom.AbvGr + Kitchen.AbvGr + 
-#  Kitchen.Qual + Functional + Fireplaces + Garage.Area + Wood.Deck.SF + 
-#  Screen.Porch + Pool.QC + Misc.Feature + Sale.Condition
-
 ames.train = read.csv("/Users/gracewang/stat318-housing-prediction/data/ames_train.csv", header=TRUE)
 ames.test = read.csv("/Users/gracewang/stat318-housing-prediction/data/ames_test.csv", header=TRUE)
 
+dim(ames.train)
+dim(ames.test)
 
-model = lm(SalePrice ~ Lot.Area + Street + Land.Slope + Neighborhood + Condition.2 + 
+# AIC Model
+aic.model = lm(SalePrice ~ Lot.Area + Street + Land.Contour + Lot.Config + Land.Slope + 
+                 Neighborhood + Condition.1 + Condition.2 + Bldg.Type + Overall.Qual + 
+                 Overall.Cond + Year.Built + Year.Remod.Add + Roof.Matl + 
+                 Exterior.1st + Mas.Vnr.Type + Mas.Vnr.Area + Exter.Qual + 
+                 Bsmt.Qual + Total.Bsmt.SF + Gr.Liv.Area + Bsmt.Full.Bath + 
+                 Bsmt.Half.Bath + Full.Bath + Bedroom.AbvGr + Kitchen.AbvGr + 
+                 Kitchen.Qual + Functional + Fireplaces + Fireplace.Qu + Garage.Type + 
+                 Garage.Cars + Garage.Area + Wood.Deck.SF + Screen.Porch + 
+                 Pool.QC + Misc.Feature + Yr.Sold + Sale.Type + Sale.Condition, data=ames.train)
+
+
+
+# BIC Model
+
+bic.model = lm(SalePrice ~ Lot.Area + Street + Land.Slope + Neighborhood + Condition.2 + 
              Bldg.Type + Overall.Qual + Overall.Cond + Year.Built + Year.Remod.Add + 
              Roof.Matl + Mas.Vnr.Area + Exter.Qual + Bsmt.Qual + Total.Bsmt.SF + 
              Gr.Liv.Area + Bsmt.Full.Bath + Bedroom.AbvGr + Kitchen.AbvGr + 
              Kitchen.Qual + Functional + Fireplaces + Garage.Area + Wood.Deck.SF + 
-             Screen.Porch + Pool.QC + Misc.Feature + Sale.Condition, data=ames.test)
+             Screen.Porch + Pool.QC + Misc.Feature + Sale.Condition, data=ames.train)
 
-test.pred = predict(model, newdata = ames.test, type="response")
-
-residuals = ames.test$SalePrice - test.pred
-
-MSE = mean(residuals^2) #536653526
-RMSE = sqrt(MSE) #23165.78
-
-plot(ames.test$SalePrice, test.pred,
-     xlab = "Actual Sale Price",
-     ylab = "Predicted Sale Price",
-     main = "Predicted vs Actual Sale Price")
+# Testing prediction on train data
+test.pred = predict(bic.model, newdata = ames.test, type="response")
+test.residuals = ames.test$SalePrice - test.pred
+test.MSE = mean(residuals^2) #536653526
+test.RMSE = sqrt(MSE) #23165.78
 
 
+# Testing prediction on train data
+train.pred = predict(bic.model, newdata = ames.train, type="response")
+train.residuals = ames.train$SalePrice - train.pred
+train.MSE = mean(residuals^2) #536653526
+train.RMSE = sqrt(MSE) #23165.78
 
 
 # ---------------------------- Regression Tree ------------------------------
