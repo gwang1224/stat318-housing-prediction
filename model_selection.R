@@ -43,7 +43,8 @@ test.pred = predict(model, newdata = ames.test, type="response")
 
 residuals = ames.test$SalePrice - test.pred
 
-MSE = mean(residuals^2)
+MSE = mean(residuals^2) #536653526
+RMSE = sqrt(MSE) #23165.78
 
 plot(ames.test$SalePrice, test.pred,
      xlab = "Actual Sale Price",
