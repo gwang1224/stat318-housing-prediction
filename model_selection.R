@@ -1,89 +1,84 @@
-data <- read.csv("/Users/gracewang/stat318-housing-prediction/data/cleaned_ames.csv")
+data <- read.csv("~/Courses/STAT 318/Project/Data/ames_fully_cleaned.csv")
+
 attach(data)
 
 library(MASS)
 library(tree)
 library(randomForest)
 library(asbio)
-library(sklearn)
+library(dplyr)
+library(tidyverse)
 
 # Variable Screening- Stepwise Automatic Selection
 model.full <- lm(SalePrice~., data=data)
 
-# AIC model using stepwise selection
+  # AIC model using stepwise selection
 model.aic <- step(model.full, direction="both", k=2)
 formula(model.aic) #formula for AIC model
 
-# BIC model using stepwise selection
+  # BIC model using stepwise selection      !!!!! The model we chose !!!!!
 model.bic <- step(model.full, direction="both", k=log(length(SalePrice)))
 formula(model.bic) #formula for BIC model
 
 
-# ---------------------------- MLR ------------------------------
-ames.train = read.csv("/Users/gracewang/stat318-housing-prediction/data/ames_train.csv", header=TRUE)
-ames.test = read.csv("/Users/gracewang/stat318-housing-prediction/data/ames_test.csv", header=TRUE)
+# K-Fold CV
+n <- 2590
+K <- 5   #each fold contains 5 observations
+n.fold <- floor(n/K)
 
-dim(ames.train)
-dim(ames.test)
+n.shuffle <- sample(1:n, n, replace=FALSE)
+index.fold <- list()
 
-# AIC Model
-aic.model = lm(SalePrice ~ Lot.Area + Street + Land.Contour + Lot.Config + Land.Slope + 
-                 Neighborhood + Condition.1 + Condition.2 + Bldg.Type + Overall.Qual + 
-                 Overall.Cond + Year.Built + Year.Remod.Add + Roof.Matl + 
-                 Exterior.1st + Mas.Vnr.Type + Mas.Vnr.Area + Exter.Qual + 
-                 Bsmt.Qual + Total.Bsmt.SF + Gr.Liv.Area + Bsmt.Full.Bath + 
-                 Bsmt.Half.Bath + Full.Bath + Bedroom.AbvGr + Kitchen.AbvGr + 
-                 Kitchen.Qual + Functional + Fireplaces + Fireplace.Qu + Garage.Type + 
-                 Garage.Cars + Garage.Area + Wood.Deck.SF + Screen.Porch + 
-                 Pool.QC + Misc.Feature + Yr.Sold + Sale.Type + Sale.Condition, data=ames.train)
+# shuffling the indices around so that it is randomly grouped into 5's
+for(i in 1:K) {
+  if(i<K)
+  {
+    index.fold[[i]] <- n.shuffle[((i-1)*n.fold+1):(i*n.fold)]
+  }else
+  {
+    index.fold[[i]] <- n.shuffle[((K-1)*n.fold+1):n]
+  }
+}
 
+# Computing for AIC
+CV.score.AIC <- 0
+Adj.R2.AIC <- 0
+for(i in 1:K) {
+  #fit the full model based on the data excluding the ith fold
+  fit <- lm(formula(model.aic), data=data[-index.fold[[i]],])
+  
+  #make prediction on each observation in the ith fold
+  pred <- predict(fit, data[index.fold[[i]],])
+  
+  #compute average squared error for the ith fold
+  CV.score.AIC <- CV.score.AIC+(1/n)*sum((SalePrice[index.fold[[i]]]-pred)^2)
+  
+  #computing adj r2
+  Adj.R2.AIC <- Adj.R2.AIC + (1/K)*summary(fit)$adj.r.squared
+}
+CV.score.AIC #780134763
+Adj.R2.AIC #0.8926555
 
-
-# BIC Model
-
-bic.model = lm(SalePrice ~ Lot.Area + Street + Land.Slope + Neighborhood + Condition.2 + 
-             Bldg.Type + Overall.Qual + Overall.Cond + Year.Built + Year.Remod.Add + 
-             Roof.Matl + Mas.Vnr.Area + Exter.Qual + Bsmt.Qual + Total.Bsmt.SF + 
-             Gr.Liv.Area + Bsmt.Full.Bath + Bedroom.AbvGr + Kitchen.AbvGr + 
-             Kitchen.Qual + Functional + Fireplaces + Garage.Area + Wood.Deck.SF + 
-             Screen.Porch + Pool.QC + Misc.Feature + Sale.Condition, data=ames.train)
-
-# Testing prediction on train data
-test.pred = predict(bic.model, newdata = ames.test, type="response")
-test.residuals = ames.test$SalePrice - test.pred
-test.MSE = mean(residuals^2) #536653526
-test.RMSE = sqrt(MSE) #23165.78
-
-
-# Testing prediction on train data
-train.pred = predict(bic.model, newdata = ames.train, type="response")
-train.residuals = ames.train$SalePrice - train.pred
-train.MSE = mean(residuals^2) #536653526
-train.RMSE = sqrt(MSE) #23165.78
-
-
-# ---------------------------- Regression Tree ------------------------------
-
-
-
-
-  # fitting the tree
-ames.tree <- tree(SalePrice~., data=data)
-plot(ames.tree)
-text(ames.tree,pretty=0,cex = 0.4)
-
-  # pruning the tree
-result <- cv.tree(ames.tree,K=10,FUN=prune.tree)
-best_size <- result$size[which.min(result$dev)]
-plot(result)
-
-ames.tree.new <- prune.tree(ames.tree, best=best_size)
-plot(ames.tree.new)
-text(ames.tree.new,pretty=0,cex = 0.4)
+# Computing for BIC
+CV.score.BIC <- 0
+Adj.R2.BIC <- 0
+for(i in 1:K) {
+  #fit the full model based on the data excluding the ith fold
+  fit <- lm(formula(model.bic), data=data[-index.fold[[i]],])
+  
+  #make prediction on each observation in the ith fold
+  pred <- predict(fit, data[index.fold[[i]],])
+  
+  #compute average squared error for the ith fold
+  CV.score.BIC <- CV.score.BIC+(1/n)*sum((SalePrice[index.fold[[i]]]-pred)^2)
+  
+  #computing adj r2
+  Adj.R2.BIC <- Adj.R2.BIC + (1/K)*summary(fit)$adj.r.squared
+}
+CV.score.BIC #788669326
+Adj.R2.BIC #0.8890774
 
 
-# Using Random Forest Ensemble Method
-#model.randomForest <- randomForest(SalePrice~.,data=data,ntree=500,mtry=(ncol(data)-1)/3)
 
 
 # LEAVE-ONE-OUT CROSS VALIDATION - comparing AIC, BIC, Regression Tree models
@@ -137,24 +132,28 @@ for (i in 1:N) {
 BIC_CV = mean(diff^2) #620420014
 BIC_CV
 
-# LOOCV for regression tree
-attach(df_no_singletons)
-N <- nrow(df_no_singletons)
-diff <- rep(NA,N)
 
-for (i in 1:N) {
-  fit <- tree(SalePrice~., data=df_no_singletons[-i,])
-  Y.hat <- predict(fit, newdata = df_no_singletons[i,] )
-  diff[i] <- SalePrice[i]-Y.hat
-}
 
-tree_CV = mean(diff^2) #1541472114
-tree_CV
 
-#AIC model has lowest leave-one-out CV score out of AIC and BIC
 
-fitted.AIC <- lm(formula(model.aic), data=data)
-summary(fitted.AIC)
+# Getting highly significant predictors P<0.001
+coefs <- summary(lm(formula(model.aic), data=data))$coefficients[,4]
+length(coefs)
+coefs_sig_aic <- coefs[coefs < 0.001]
+which(coefs_sig_aic == min(coefs_sig_aic))
 
-fitted.BIC <- lm(formula(model.bic), data=data)
-summary(fitted.BIC)
+coefs_bic <- summary(lm(formula(model.bic), data=data))$coefficients[,4]
+length(coefs_bic)
+coefs_sig_bic <- coefs_bic[coefs_bic < 0.001]
+which(coefs_sig_bic == min(coefs_sig_bic))
+
+coefs_aic_df <- data.frame(coefs_sig_aic)
+coefs_aic_df.index.name <- "coefs"
+ggplot(coefs_aic_df, aes(x = class)) +
+  geom_bar()
+
+most_sig_AIC <- head(sort(coefs_sig_aic[-1]))
+most_sig_BIC <- head(sort(coefs_sig_bic[-1]))
+
+#plotting most significant predictors of AIC and BIC models
+
