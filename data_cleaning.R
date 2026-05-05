@@ -1,43 +1,12 @@
 # ------------------------------------
-# Data Cleaning
+# Data Cleaning- Removing Missingness
 # ------------------------------------
 data = read.csv("/Users/gracewang/stat318-housing-prediction/data/AmesHousing.csv", header=TRUE)
 summary(data)
 
-
 # Inventory of NA's
 colSums(is.na(data))
-na.counts <- colSums(is.na(data))
-txt <- capture.output(print(na.counts))
-
-png("figures/na_counts.png", width = 1200, height = 800)
-par(mar = c(1, 1, 1, 1))
-plot.new()
-text(0, 1, paste(txt, collapse = "\n"),
-     adj = c(0, 1), family = "mono", cex = 1)
-dev.off()
-
-# Missingness in Data
-# Pool.QC — 2916
-# Alley — 2731
-# Misc.Feature — 2823
-# Fence — 2358
-# Fireplace.Qu — 1421
-# Lot.Frontage — 490
-# Garage.Qual — 158
-# Garage.Cond — 158
-# Garage.Type — 157
-# Garage.Finish — 157
-# Bsmt.Qual — 79
-# Bsmt.Cond — 79
-# Bsmt.Exposure — 79
-# BsmtFin.Type.1 — 79
-# BsmtFin.Type.2 — 79
-# Mas.Vnr.Area — 23
-# Bsmt.Full.Bath — 1
-# Bsmt.Half.Bath — 1
-# Garage.Cars — 1
-# Garage.Area — 1
+sum(colSums(is.na(data)) > 0) #25 features have missing values
 
 # NA's in Pool.QC indicate that house does not have a pool, replace all NA's with NP = Not Present
 data$Pool.QC[is.na(data$Pool.QC)] = "NP"
@@ -49,26 +18,6 @@ data$Fireplace.Qu[is.na(data$Fireplace.Qu)] = "NP"
 data$Garage.Type[is.na(data$Garage.Type)] = "NP"
 data$Garage.Finish[is.na(data$Garage.Finish)] = "NP"
 data$Alley[is.na(data$Alley)] = "NP"
-
-# Lot.Frontage 490 samples is 16.7% of the data, opt to remove Lot.Frontage
-data = subset(data, select = -Lot.Frontage)
-
-
-# Most of the rest of the missing variable occurs in one sample
-rows = data[is.na(data$BsmtFin.SF.1), ]
-colnames(rows)[colSums(is.na(rows)) > 0]
-# Remove the row with the missing data
-data = data[!is.na(data$BsmtFin.SF.2),]
-
-
-rows = data[is.na(data$Bsmt.Full.Bath),]
-colnames(rows)[colSums(is.na(rows)) > 0]
-data = data[!is.na(data$Bsmt.Full.Bath),]
-
-rows = data[is.na(data$Garage.Cars), ]
-colnames(rows)[colSums(is.na(rows)) > 0]
-# Remove the row with the missing data
-data = data[!is.na(data$Garage.Cars),]
 
 # Indicator variable for when Garage is not present
 data$Garage.Yr.Blt[is.na(data$Garage.Yr.Blt)] = "NP"
@@ -83,7 +32,26 @@ data$BsmtFin.Type.1[is.na(data$BsmtFin.Type.1)] = "NP"
 data$BsmtFin.Type.2[is.na(data$BsmtFin.Type.2)] = "NP"
 
 # Indicator variable when there is no Masonry veneer 
-data$Mas.Vnr.Area[is.na(data$Mas.Vnr.Area)] = 0
+data$Mas.Vnr.Area[is.na(data$Mas.Vnr.Area)] = "NP"
+
+
+# Lot.Frontage 490 samples is 16.7% of the data, opt to remove Lot.Frontage
+data = subset(data, select = -Lot.Frontage)
+
+
+# 3 samples that comtain many missing values
+rows = data[is.na(data$BsmtFin.SF.1), ]
+colnames(rows)[colSums(is.na(rows)) > 0]
+data = data[!is.na(data$BsmtFin.SF.2),]
+
+rows = data[is.na(data$Bsmt.Full.Bath),]
+colnames(rows)[colSums(is.na(rows)) > 0]
+data = data[!is.na(data$Bsmt.Full.Bath),]
+
+rows = data[is.na(data$Garage.Cars), ]
+colnames(rows)[colSums(is.na(rows)) > 0]
+data = data[!is.na(data$Garage.Cars),]
+
 
 # Removing columns for Order, PID - identifiers not used for prediction
 data = data[,-c(1,2)]
