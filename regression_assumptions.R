@@ -63,6 +63,7 @@ new.bic.model = lm(SalePrice^0.26 ~ Lot.Area + Lot.Config + Land.Slope + Neighbo
                      Screen.Porch + Misc.Val + Sale.Condition, data=ames.train.clean)
 
 summary(new.bic.model)
+anova(new.bic.model)
 
 # Resid plot
 plot(resid(new.bic.model)~fitted(new.bic.model), xlab="Y.hat", ylab="Residuals")
