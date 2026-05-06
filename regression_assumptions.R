@@ -1,7 +1,7 @@
 # ------------------------------------
 # Regression Assumptions for BIC Model
 # ------------------------------------
-ames.train = read.csv("/Users/gracewang/stat318-housing-prediction/data/ames_fully_cleaned.csv", header=TRUE)
+ames.train = read.csv("/Users/gracewang/stat318-housing-prediction/data/AmesHousing_no_na.csv", header=TRUE)
 
 bic.model = lm(SalePrice ~ Lot.Area + Lot.Config + Land.Slope + Neighborhood + 
                  Condition.1 + Bldg.Type + House.Style + Overall.Qual + Overall.Cond + 
@@ -18,16 +18,21 @@ plot(resid(bic.model)~fitted(bic.model), xlab="Y.hat", ylab="Residuals")
 abline(h=0, col="red")
 
 # Normality
-qqnorm(resid(new.bic.model))
-qqline(resid(new.bic.model), col = "red")
+qqnorm(resid(bic.model))
+qqline(resid(bic.model), col = "red")
 
 
 
 # Outliers
-cooks <- cooks.distance(new.bic.model)
+cooks <- cooks.distance(bic.model)
 
-sort(cooks, decreasing = TRUE)[1:10]
-influential_index <- which.max(cooks)
+
+n <- nrow(ames.train)
+p <- length(coef(bic.model))
+
+
+# 50th percentile of F distribution
+cutoff <- qf(0.50, df1 = p, df2 = n - p)
 
 plot(
   cooks,
@@ -36,6 +41,7 @@ plot(
   ylab = "Cook's Distance",
   xlab = "Observation Index"
 )
+abline(h=cutoff, col="red")
 
 ames.train.clean <- ames.train[-c(1931, 1333, 1673), ]
 

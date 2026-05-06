@@ -1,7 +1,7 @@
 # ------------------------------------
 # Data Cleaning- Removing Missingness
 # ------------------------------------
-data = read.csv("/Users/gracewang/stat318-housing-prediction/data/AmesHousing.csv", header=TRUE)
+data = read.csv("data/AmesHousing.csv", header=TRUE)
 summary(data)
 
 # Inventory of NA's
@@ -58,7 +58,7 @@ data = data[,-c(1,2)]
 
 colSums(is.na(data))
 
-write.csv(data, "/Users/gracewang/stat318-housing-prediction/data/ames_no_na.csv", row.names = FALSE)
+write.csv(data, "/Users/gracewang/stat318-housing-prediction/data/AmesHousing_no_na.csv", row.names = FALSE)
 
 dim(data)
 
