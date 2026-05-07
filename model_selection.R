@@ -20,6 +20,16 @@ formula(model.aic) #formula for AIC model
 model.bic <- step(model.full, direction="both", k=log(length(SalePrice)))
 formula(model.bic) #formula for BIC model
 
+# Predictor Variables
+predictors_aic <- all.vars(formula(model.aic)[-2])
+predictors_bic <- all.vars(formula(model.bic)[-2])
+
+length(predictors_aic) #36
+length(predictors_bic) #26
+
+# is the BIC model nested in the AIC model? YES
+length(intersect(predictors_aic,predictors_bic)) #length 26
+
 
 # K-Fold CV
 n <- 2590
