@@ -97,3 +97,8 @@ plot(ames.train.clean$Yr.Sold, res,
 abline(h = 0, lty = 2)
 
 summary(new.bic.model)
+
+# Calculating the final RMSE
+pred_orig <- predict(new.bic.model)^(1/0.18)
+MSE <- mean((ames.train.clean$SalePrice - pred_orig)^2)
+sqrt(MSE)
