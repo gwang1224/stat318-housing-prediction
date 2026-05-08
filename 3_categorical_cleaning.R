@@ -1,12 +1,9 @@
+# ------------------------------------
+# Categorical Variable Preprocessing
+# ------------------------------------
+
 data <- read.csv("data/cleaned_ames.csv")
 attach(data)
-
-# creating a dataframe of just the categorical predictors and making them factors
-#cat_df <- data[, sapply(data, is.character)]
-#cat_df[] <- lapply(cat_df, as.factor)
-
-# viewing all the counts of the different levels of categorical predictors
-#summary(cat_df)
 
 # MS.Zoning
 data = data[-which(data$MS.Zoning=="A (agr)"),] #getting rid of A (agr):   2
