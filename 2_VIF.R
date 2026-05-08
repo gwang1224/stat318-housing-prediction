@@ -1,3 +1,7 @@
+# ------------------------------------
+# Multicollinearity screening
+# ------------------------------------
+
 library(car)
 
 ames = read.csv("data/AmesHousing_no_na.csv", header=TRUE)
@@ -49,12 +53,9 @@ factor_vars <- c(
   "Sale.Condition"
 )
 
-
 ames[factor_vars] <- lapply(ames[factor_vars], factor)
 
-
-
-# Check for multicollinearity
+# Check for aliases
 model = lm(SalePrice~., data=ames)
 
 al <- alias(model)
@@ -79,11 +80,7 @@ ames = subset(ames, select = -c(MS.SubClass,
                                 X1st.Flr.SF, X2nd.Flr.SF, Low.Qual.Fin.SF, 
                                 Garage.Cond, Garage.Qual, Garage.Finish, Garage.Yr.Blt, Mas.Vnr.Area))
 
-#library(usdm)
-#numeric_df <- ames[, sapply(ames, is.numeric)]
-#vifstep(numeric_df)
-
-
+# Multicollinearity screening with GVIF
 model = lm(SalePrice~., data=ames)
 gvif = car::vif(model)
 gvif[,3]^2
@@ -108,7 +105,6 @@ ames = subset(ames, select = -c(Gr.Liv.Area))
 model = lm(SalePrice~., data=ames)
 gvif = car::vif(model)
 gvif[,3]^2
-
 
 write.csv(ames, "/Users/gracewang/stat318-housing-prediction/data/cleaned_ames.csv", row.names = FALSE)
 
