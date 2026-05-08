@@ -19,12 +19,13 @@ formula(model.bic) #formula for BIC model
 predictors_aic <- all.vars(formula(model.aic)[-2])
 predictors_bic <- all.vars(formula(model.bic)[-2])
 
-length(predictors_aic) #36
-length(predictors_bic) #22
+length(predictors_aic) #37
+length(predictors_bic) #23
 
 # is the BIC model nested in the AIC model? YES
-length(intersect(predictors_aic,predictors_bic)) #length 26
+length(intersect(predictors_aic,predictors_bic)) #length 23
 
+anova(model.bic, model.aic)
 
 # K-Fold CV
 n <- 2590
@@ -61,8 +62,8 @@ for(i in 1:K) {
   #computing adj r2
   Adj.R2.AIC <- Adj.R2.AIC + (1/K)*summary(fit)$adj.r.squared
 }
-CV.score.AIC #834347226
-Adj.R2.AIC #0.8907891
+CV.score.AIC #924509276
+Adj.R2.AIC #0.872163
 
 # Computing for BIC
 CV.score.BIC <- 0
@@ -80,8 +81,8 @@ for(i in 1:K) {
   #computing adj r2
   Adj.R2.BIC <- Adj.R2.BIC + (1/K)*summary(fit)$adj.r.squared
 }
-CV.score.BIC #826324698
-Adj.R2.BIC #0.8865663
+CV.score.BIC #920106898
+Adj.R2.BIC #0.8653614
 
 
 
