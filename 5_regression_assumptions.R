@@ -12,7 +12,7 @@ bic.model = lm(SalePrice ~ Lot.Area + Lot.Config + Land.Slope + Neighborhood +
 
 summary(bic.model) #adj r^2 = 0.885
 
-par(mfrow = c(1,2))
+par(mfrow = c(2,2))
 # Residual plot
 plot(resid(bic.model)~fitted(bic.model), xlab="Y.hat", ylab="Residuals", main = "Residual Plot")
 abline(h=0, col="red")
@@ -75,9 +75,13 @@ abline(h=0, col="red")
 
 summary(new.bic.model)
 
+par(mfrow=c(2,2))
+plot(new.bic.model)
+
 
 
 library(MASS)
+par(mfrow = c(1,1))
 bc = boxcox(new.bic.model)
 bc$x[which.max(bc$y)] #0.26
 
@@ -90,14 +94,25 @@ new.bic.model = lm(SalePrice^0.18 ~ Lot.Area + Lot.Config + Land.Slope + Neighbo
 
 summary(new.bic.model)
 
+par(mfrow = c(1,2))
 # Resid plot
-plot(resid(new.bic.model)~fitted(new.bic.model), xlab="Y.hat", ylab="Residuals")
+plot(resid(new.bic.model)~fitted(new.bic.model), xlab="Y.hat", ylab="Residuals", main="Residual Plot")
 abline(h=0, col="red")
 
 # FINAL
 qqnorm(resid(new.bic.model))
 qqline(resid(new.bic.model), col = "red")
 
+par(mfrow = c(1,1))
+# Validate time series
+res <- residuals(new.bic.model)
+plot(ames.train.clean$Yr.Sold, res,
+     type = "p",
+     pch = 19,
+     xlab = "Year Sold",
+     ylab = "Residual",
+     main = "Residuals Versus Year Sold")
 
+abline(h = 0, lty = 2)
 
-
+summary(new.bic.model)
