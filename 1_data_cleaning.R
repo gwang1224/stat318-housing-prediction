@@ -60,5 +60,3 @@ colSums(is.na(data))
 
 write.csv(data, "/Users/gracewang/stat318-housing-prediction/data/AmesHousing_no_na.csv", row.names = FALSE)
 
-dim(data)
-
