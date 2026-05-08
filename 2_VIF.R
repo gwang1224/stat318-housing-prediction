@@ -1,6 +1,6 @@
 library(car)
 
-ames = read.csv("/Users/gracewang/stat318-housing-prediction/data/ames_no_na.csv", header=TRUE)
+ames = read.csv("data/AmesHousing_no_na.csv", header=TRUE)
 
 factor_vars <- c(
   "MS.SubClass",
@@ -77,11 +77,13 @@ ames = subset(ames, select = -c(MS.SubClass,
                                 Exterior.2nd, 
                                 Bsmt.Cond, Bsmt.Exposure, BsmtFin.SF.1, BsmtFin.SF.2, Bsmt.Unf.SF, BsmtFin.Type.1, BsmtFin.Type.2, 
                                 X1st.Flr.SF, X2nd.Flr.SF, Low.Qual.Fin.SF, 
-                                Garage.Cond, Garage.Qual, Garage.Finish, Garage.Yr.Blt))
+                                Garage.Cond, Garage.Qual, Garage.Finish, Garage.Yr.Blt, Mas.Vnr.Area))
 
 
 
 model = lm(SalePrice~., data=ames)
 car::vif(model)
+alias(model)
+rownames(al$Complete)
 
 write.csv(ames, "/Users/gracewang/stat318-housing-prediction/data/cleaned_ames.csv", row.names = FALSE)

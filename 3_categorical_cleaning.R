@@ -1,4 +1,4 @@
-data <- read.csv("~/Courses/STAT 318/Project/Data/cleaned_ames.csv")
+data <- read.csv("data/AmesHousing_no_na.csv")
 attach(data)
 
 # creating a dataframe of just the categorical predictors and making them factors
@@ -207,4 +207,4 @@ summary(cat_df$Sale.Type)
 
 
 # Saving to CSV => ames_fully_cleaned.csv
-write.csv(data, "~/Courses/STAT 318/Project/Data/ames_fully_cleaned.csv", row.names = FALSE)
+write.csv(data, "data/ames_fully_cleaned.csv", row.names = FALSE)

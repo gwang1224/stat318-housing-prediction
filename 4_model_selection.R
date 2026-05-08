@@ -1,13 +1,8 @@
-data <- read.csv("~/Courses/STAT 318/Project/Data/ames_fully_cleaned.csv")
+data <- read.csv("data/ames_fully_cleaned.csv")
 
 attach(data)
-
 library(MASS)
-library(tree)
-library(randomForest)
-library(asbio)
 library(dplyr)
-library(tidyverse)
 
 # Variable Screening- Stepwise Automatic Selection
 model.full <- lm(SalePrice~., data=data)
@@ -25,7 +20,7 @@ predictors_aic <- all.vars(formula(model.aic)[-2])
 predictors_bic <- all.vars(formula(model.bic)[-2])
 
 length(predictors_aic) #36
-length(predictors_bic) #26
+length(predictors_bic) #22
 
 # is the BIC model nested in the AIC model? YES
 length(intersect(predictors_aic,predictors_bic)) #length 26
@@ -66,8 +61,8 @@ for(i in 1:K) {
   #computing adj r2
   Adj.R2.AIC <- Adj.R2.AIC + (1/K)*summary(fit)$adj.r.squared
 }
-CV.score.AIC #780134763
-Adj.R2.AIC #0.8926555
+CV.score.AIC #834347226
+Adj.R2.AIC #0.8907891
 
 # Computing for BIC
 CV.score.BIC <- 0
@@ -85,64 +80,8 @@ for(i in 1:K) {
   #computing adj r2
   Adj.R2.BIC <- Adj.R2.BIC + (1/K)*summary(fit)$adj.r.squared
 }
-CV.score.BIC #788669326
-Adj.R2.BIC #0.8890774
-
-
-
-
-# LEAVE-ONE-OUT CROSS VALIDATION - comparing AIC, BIC, Regression Tree models
-# getting rid of all the samples with single observation per categorical level
-categorical <- names(data)[sapply(data, is.character)]
-df_no_singletons <- data
-
-repeat {
-  before_n <- nrow(df_no_singletons)
-  
-  for (column_name in categorical) {
-    counts <- table(df_no_singletons[[column_name]])
-    keep_levels <- names(counts[counts > 1])
-    
-    df_no_singletons <- df_no_singletons[
-      df_no_singletons[[column_name]] %in% keep_levels,
-      ,
-      drop = FALSE
-    ]
-  }
-  
-  if (nrow(df_no_singletons) == before_n) break
-}
-
-
-  # LOOCV for AIC 
-attach(df_no_singletons)
-N <- nrow(df_no_singletons)
-diff <- rep(NA,N)
-
-for (i in 1:N) {
-  fit <- lm(formula(model.aic), data=df_no_singletons[-i,])
-  Y.hat <- predict(fit, newdata = df_no_singletons[i,] )
-  diff[i] <- SalePrice[i]-Y.hat
-}
-
-AIC_CV = mean(diff^2) #605886404
-AIC_CV
-
-  # LOOCV for BIC 
-attach(df_no_singletons)
-N <- nrow(df_no_singletons)
-diff <- rep(NA,N)
-
-for (i in 1:N) {
-  fit <- lm(formula(model.bic), data=df_no_singletons[-i,])
-  Y.hat <- predict(fit, newdata = df_no_singletons[i,] )
-  diff[i] <- SalePrice[i]-Y.hat
-}
-
-BIC_CV = mean(diff^2) #620420014
-BIC_CV
-
-
+CV.score.BIC #826324698
+Adj.R2.BIC #0.8865663
 
 
 
@@ -159,11 +98,7 @@ which(coefs_sig_bic == min(coefs_sig_bic))
 
 coefs_aic_df <- data.frame(coefs_sig_aic)
 coefs_aic_df.index.name <- "coefs"
-ggplot(coefs_aic_df, aes(x = class)) +
-  geom_bar()
 
 most_sig_AIC <- head(sort(coefs_sig_aic[-1]))
 most_sig_BIC <- head(sort(coefs_sig_bic[-1]))
-
-#plotting most significant predictors of AIC and BIC models
 
