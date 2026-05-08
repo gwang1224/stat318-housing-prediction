@@ -1,4 +1,4 @@
-data <- read.csv("data/AmesHousing_no_na.csv")
+data <- read.csv("data/cleaned_ames.csv")
 attach(data)
 
 # creating a dataframe of just the categorical predictors and making them factors

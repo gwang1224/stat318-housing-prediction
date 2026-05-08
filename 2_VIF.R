@@ -79,11 +79,37 @@ ames = subset(ames, select = -c(MS.SubClass,
                                 X1st.Flr.SF, X2nd.Flr.SF, Low.Qual.Fin.SF, 
                                 Garage.Cond, Garage.Qual, Garage.Finish, Garage.Yr.Blt, Mas.Vnr.Area))
 
+#library(usdm)
+#numeric_df <- ames[, sapply(ames, is.numeric)]
+#vifstep(numeric_df)
 
 
 model = lm(SalePrice~., data=ames)
-car::vif(model)
-alias(model)
-rownames(al$Complete)
+gvif = car::vif(model)
+gvif[,3]^2
+
+# Year.Built = 12.707
+ames = subset(ames, select = -c(Year.Built))
+
+model = lm(SalePrice~., data=ames)
+gvif = car::vif(model)
+gvif[,3]^2
+
+#Pool.Area = 23.719
+ames = subset(ames, select = -c(Pool.Area))
+
+model = lm(SalePrice~., data=ames)
+gvif = car::vif(model)
+gvif[,3]^2
+
+#Gr.Liv.Area = 11.171
+ames = subset(ames, select = -c(Gr.Liv.Area))
+
+model = lm(SalePrice~., data=ames)
+gvif = car::vif(model)
+gvif[,3]^2
+
 
 write.csv(ames, "/Users/gracewang/stat318-housing-prediction/data/cleaned_ames.csv", row.names = FALSE)
+
+
