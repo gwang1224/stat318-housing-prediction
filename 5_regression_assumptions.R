@@ -1,16 +1,15 @@
 # ------------------------------------
 # Regression Assumptions for BIC Model
 # ------------------------------------
-ames.train = read.csv("/Users/gracewang/stat318-housing-prediction/data/AmesHousing_no_na.csv", header=TRUE)
+ames.train = read.csv("/Users/gracewang/stat318-housing-prediction/data/ames_fully_cleaned.csv", header=TRUE)
 
 bic.model = lm(SalePrice ~ Lot.Area + Lot.Config + Land.Slope + Neighborhood + 
                  Condition.1 + Bldg.Type + House.Style + Overall.Qual + Overall.Cond + 
-                 Year.Built + Mas.Vnr.Type + Mas.Vnr.Area + Exter.Qual + Bsmt.Qual + 
-                 Gr.Liv.Area + Bsmt.Full.Bath + Full.Bath + Bedroom.AbvGr + 
-                 Kitchen.Qual + Functional + Fireplaces + Garage.Cars + Wood.Deck.SF + 
-                 Screen.Porch + Misc.Val + Sale.Condition, data=ames.train)
+                 Year.Built + Exter.Qual + Bsmt.Qual + Gr.Liv.Area + Bsmt.Full.Bath + 
+                 Bedroom.AbvGr + Kitchen.Qual + Functional + Garage.Cars + 
+                 Wood.Deck.SF + Screen.Porch + Misc.Val + Sale.Condition, data=ames.train)
 
-summary(bic.model) #adj r^2 = 0.888
+summary(bic.model) #adj r^2 = 0.885
 
 
 # Residual plot
